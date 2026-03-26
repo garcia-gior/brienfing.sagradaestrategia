@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Briefing de Marca — Sagrada Estratégia</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #D4A843;
+  --gold-dim: #A07828;
+  --gold-light: rgba(212,168,67,0.1);
+  --gold-border: rgba(212,168,67,0.2);
+  --black: #0C0C0C;
+  --surface: #141414;
+  --surface2: #1C1C1C;
+  --surface3: #252525;
+  --text: #E8E2D4;
+  --text-dim: #8A8070;
+  --text-muted: #4A4540;
+  --radius: 6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;font-size:15px;line-height:1.7;overflow-x:hidden}
+
+/* ── BARRA DE PROGRESSO ── */
+.prog-bar{position:fixed;top:0;left:0;right:0;height:2px;background:rgba(255,255,255,0.06);z-index:100}
+.prog-fill{height:100%;background:var(--gold);width:0%;transition:width .5s ease}
+
+/* ── LOGO TOPO ── */
+.logo-topo{position:fixed;top:20px;left:50%;transform:translateX(-50%);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);z-index:99;opacity:0;transition:opacity .4s}
+.logo-topo.visivel{opacity:1}
+
+/* ── TELAS ── */
+.tela{display:none;min-height:100vh;width:100%}
+.tela.ativa{display:flex}
+
+/* ── HERO ── */
+#tela-hero{flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px;position:relative;overflow:hidden}
+#tela-hero::before{content:'';position:absolute;width:560px;height:560px;border-radius:50%;border:1px solid rgba(212,168,67,0.08);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+#tela-hero::after{content:'';position:absolute;width:360px;height:360px;border-radius:50%;border:1px solid rgba(212,168,67,0.06);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.hero-label{font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:28px;opacity:0;animation:fadeUp .8s .2s ease forwards}
+.hero-h1{font-family:'Cormorant Garamond',serif;font-size:clamp(42px,7vw,72px);font-weight:300;line-height:1.05;margin-bottom:32px;opacity:0;animation:fadeUp .8s .4s ease forwards}
+.hero-h1 em{font-style:italic;color:var(--gold)}
+.hero-sub{font-size:15px;color:var(--text-dim);max-width:420px;margin:0 auto 16px;opacity:0;animation:fadeUp .8s .6s ease forwards;line-height:1.7}
+.hero-sub2{font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--text-muted);margin-bottom:52px;opacity:0;animation:fadeUp .8s .75s ease forwards}
+.btn-hero{display:inline-flex;align-items:center;gap:10px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:18px 48px;cursor:pointer;transition:background .2s,color .2s;opacity:0;animation:fadeUp .8s .9s ease forwards}
+.btn-hero:hover{background:var(--gold);color:var(--black)}
+.btn-hero .seta{font-size:16px;transition:transform .2s}
+.btn-hero:hover .seta{transform:translateX(4px)}
+
+/* ── ETAPA ── */
+#tela-etapa{flex-direction:column;align-items:center;justify-content:flex-start;padding:80px 24px 120px}
+.etapa-wrap{width:100%;max-width:620px}
+.etapa-num{font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:6px}
+.etapa-titulo{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,5vw,44px);font-weight:300;line-height:1.1;margin-bottom:10px}
+.etapa-titulo em{font-style:italic;color:var(--gold)}
+.etapa-desc{font-size:14px;color:var(--text-dim);margin-bottom:40px;line-height:1.6}
+.etapa-divider{width:36px;height:1px;background:var(--gold);opacity:.4;margin-bottom:40px}
+
+/* Campos */
+.campo{margin-bottom:28px}
+.campo label{display:block;font-size:15px;font-weight:400;color:var(--text);margin-bottom:5px;line-height:1.4}
+.campo .ex{font-size:13px;color:var(--text-dim);font-style:italic;margin-bottom:9px;padding-left:11px;border-left:2px solid var(--gold-border);line-height:1.5}
+.campo input[type=text],.campo input[type=email],.campo input[type=tel],.campo textarea{width:100%;background:var(--surface2);border:1px solid var(--surface3);border-radius:var(--radius);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:300;padding:12px 14px;outline:none;transition:border-color .2s,background .2s;resize:none}
+.campo input:focus,.campo textarea:focus{border-color:var(--gold);background:var(--surface3)}
+.campo textarea{min-height:96px;line-height:1.6}
+.campo textarea.tall{min-height:140px}
+.campo input::placeholder,.campo textarea::placeholder{color:var(--text-muted)}
+
+/* Choices (radio/checkbox visual) */
+.choices{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.choice-item{display:none}
+.choice-label{display:inline-block;padding:8px 16px;border:1px solid var(--surface3);border-radius:var(--radius);font-size:13px;color:var(--text-dim);cursor:pointer;transition:border-color .2s,color .2s,background .2s;user-select:none}
+.choice-item:checked + .choice-label{border-color:var(--gold);color:var(--gold);background:var(--gold-light)}
+.choice-label:hover{border-color:var(--gold-border);color:var(--text)}
+
+/* Upload */
+.upload-area{border:1px dashed var(--gold-border);border-radius:var(--radius);padding:24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s}
+.upload-area:hover{border-color:var(--gold);background:var(--gold-light)}
+.upload-area input{display:none}
+.upload-area p{font-size:13px;color:var(--text-dim);margin-top:6px}
+.upload-nome{color:var(--gold);font-size:13px;margin-top:6px}
+.upload-icone{font-size:20px;opacity:.4;margin-bottom:4px}
+
+/* Nota */
+.nota{background:rgba(212,168,67,0.07);border:1px solid var(--gold-border);border-radius:var(--radius);padding:13px 16px;font-size:13px;color:var(--gold-dim);font-style:italic;margin-top:4px;margin-bottom:4px;line-height:1.5}
+
+/* Sub-título de seção */
+.sec{font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--gold-dim);margin:36px 0 18px}
+
+/* Erro */
+.campo-erro{display:none;font-size:12px;color:#E07070;margin-top:5px}
+.campo.invalido input,.campo.invalido textarea{border-color:#A32D2D}
+.campo.invalido .campo-erro{display:block}
+
+/* ── NAVEGAÇÃO ── */
+.nav-etapa{position:fixed;bottom:0;left:0;right:0;padding:18px 24px;background:linear-gradient(to top,var(--black) 60%,transparent);display:flex;justify-content:center;gap:16px;z-index:50}
+.btn-nav{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px solid var(--surface3);color:var(--text-dim);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;padding:13px 32px;cursor:pointer;transition:all .2s;border-radius:var(--radius)}
+.btn-nav:hover{border-color:var(--text-dim);color:var(--text)}
+.btn-nav.primary{border-color:var(--gold);color:var(--gold)}
+.btn-nav.primary:hover{background:var(--gold);color:var(--black)}
+.btn-nav:disabled{opacity:.3;cursor:not-allowed}
+
+/* ── SUCESSO ── */
+#tela-sucesso{flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px}
+#tela-sucesso .icone{font-size:36px;margin-bottom:28px;opacity:.7}
+#tela-sucesso h2{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,5vw,48px);font-weight:300;margin-bottom:16px;line-height:1.1}
+#tela-sucesso h2 em{font-style:italic;color:var(--gold)}
+#tela-sucesso p{font-size:14px;color:var(--text-dim);max-width:400px;line-height:1.7;margin-bottom:8px}
+#tela-sucesso .marca{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted);margin-top:40px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* Animação de entrada da etapa */
+.etapa-wrap{opacity:0;transform:translateY(16px);transition:opacity .4s ease,transform .4s ease}
+.etapa-wrap.visivel{opacity:1;transform:translateY(0)}
+
+@media(max-width:600px){
+  #tela-etapa{padding:72px 16px 100px}
+  .btn-nav{padding:12px 22px;font-size:11px}
+}
+</style>
+</head>
+<body>
+
+<div class="prog-bar"><div class="prog-fill" id="prog"></div></div>
+<div class="logo-topo" id="logo-topo">Sagrada Estratégia</div>
+
+<!-- ── HERO ── -->
+<div class="tela ativa" id="tela-hero">
+  <div class="hero-label">Briefing de Marca</div>
+  <h1 class="hero-h1">Antes da estratégia,<br><em>vem a verdade.</em></h1>
+  <p class="hero-sub">Suas respostas são a matéria-prima do seu manual. Quanto mais honesta e detalhada, mais preciso e poderoso será o resultado.</p>
+  <p class="hero-sub2">Isso não é um formulário.<br>É o começo de uma mudança de jogo.</p>
+  <button class="btn-hero" onclick="iniciar()">Começar <span class="seta">→</span></button>
+</div>
+
+<!-- ── ETAPA ── -->
+<div class="tela" id="tela-etapa">
+  <div class="etapa-wrap" id="etapa-wrap">
+    <!-- conteúdo injetado por JS -->
+  </div>
+</div>
+
+<!-- NAVEGAÇÃO -->
+<div class="nav-etapa" id="nav-etapa" style="display:none">
+  <button class="btn-nav" id="btn-voltar" onclick="voltar()">← Voltar</button>
+  <button class="btn-nav primary" id="btn-avancar" onclick="avancar()">Continuar →</button>
+</div>
+
+<!-- ── SUCESSO ── -->
+<div class="tela" id="tela-sucesso">
+  <div class="icone">✦</div>
+  <h2>Briefing recebido<br><em>com sucesso.</em></h2>
+  <p>Suas respostas estão a salvo. Em breve Giordana entrará em contato para dar os próximos passos.</p>
+  <p class="marca">@sagradaestrategia</p>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxurINgB5XO67P-gGJvxW2lBhZ9Gus3oydmcE0Tqmk8ZnrSR56x3cN9jzpFrYNZ7UU/exec';
+
+// ── DEFINIÇÃO DAS ETAPAS ────────────────────────────────────
+const etapas = [
+  {
+    num: 'Antes de começar',
+    titulo: 'Seus dados<br><em>de contato</em>',
+    desc: 'Precisamos dessas informações para te enviar o manual e manter contato durante o processo.',
+    campos: [
+      { type:'text', name:'nome', label:'Nome completo', placeholder:'Como você se chama', required:true },
+      { type:'tel',  name:'whatsapp', label:'WhatsApp com DDD', placeholder:'(11) 99999-9999', required:true },
+      { type:'email',name:'email', label:'E-mail', placeholder:'seu@email.com', required:true },
+      { type:'text', name:'instagram', label:'@ do Instagram ou principal rede social', placeholder:'@suamarca', required:true },
+    ]
+  },
+  {
+    num: 'Bloco 1 — Contexto de negócio',
+    titulo: 'Quem é<br><em>esse negócio?</em>',
+    desc: 'Entender quem é esse negócio, o que faz e onde está hoje.',
+    campos: [
+      { type:'text', name:'nome_marca', label:'Qual é o nome oficial da sua marca ou negócio?', ex:'Pode ser o nome fantasia mesmo — como você quer ser reconhecida no mercado.', placeholder:'Nome da marca' },
+      { type:'text', name:'cnpj', label:'Seu negócio já tem CNPJ ou ainda está como informal?', ex:'Sem julgamento — muitos começam sem e crescem muito assim.', placeholder:'Ex: tenho CNPJ / ainda informal' },
+      { type:'text', name:'segmento', label:'Qual é o segmento em que você atua?', ex:'Ex: saúde e bem-estar, moda, educação, gastronomia, serviços criativos, beleza, tecnologia...', placeholder:'Seu segmento' },
+      { type:'text', name:'tempo_negocio', label:'Há quanto tempo o negócio existe?', ex:'Pode ser "lancei semana passada" ou "10 anos" — cada fase tem suas próprias necessidades.', placeholder:'Ex: 2 anos' },
+      { type:'text', name:'abrangencia', label:'Onde você atende? Local, regional, nacional ou online?', ex:'Ex: só no meu bairro em SP, em todo o Brasil pelo Instagram, clientes no exterior também...', placeholder:'Ex: Brasil todo, online' },
+    ]
+  },
+  {
+    num: 'Bloco 1 — Produto e momento',
+    titulo: 'O que você<br><em>vende e entrega?</em>',
+    desc: 'Entender o produto, a jornada do cliente e o momento atual do negócio.',
+    campos: [
+      { type:'textarea', name:'produtos', label:'O que você vende, exatamente? Liste tudo o que oferece.', ex:'Não precisa ser uma lista perfeita. Joga tudo aqui — produtos, serviços, cursos, consultorias, o que for.', placeholder:'Liste seus produtos e serviços...', tall:true },
+      { type:'text', name:'ticket', label:'Qual é o seu ticket médio? Tem faixas de preço diferentes?', ex:'Ex: vendo desde R$50 até pacotes de R$3.000. Ou: tudo custa em torno de R$200.', placeholder:'Ex: R$200 a R$1.500' },
+      { type:'text', name:'entrega', label:'A entrega é presencial, online ou híbrida?', placeholder:'Ex: online, híbrida...' },
+      { type:'textarea', name:'jornada', label:'Como é o caminho do seu cliente do momento em que te descobre até a compra?', ex:'Ex: ela me vê no Instagram → manda mensagem → faço uma call → envio proposta → fecha.', placeholder:'Descreve o caminho do cliente...' },
+      { type:'textarea', name:'canais_atuais', label:'Por onde chegam seus clientes hoje?', ex:'Ex: maioria pelo boca a boca, alguns pelo Instagram, ninguém pelo site ainda.', placeholder:'Ex: indicação, Instagram, Google...' },
+      { type:'textarea', name:'historico_marca', label:'Já teve algum trabalho de identidade visual ou de marca antes?', ex:'Logo, manual, paleta. Se sim, o que funcionou e o que travou? Se tiver logo, envie diretamente para Giordana.', placeholder:'Conte o que já foi feito...' },
+    ]
+  },
+  {
+    num: 'Bloco 2 — Posicionamento',
+    titulo: 'O que te<br><em>diferencia?</em>',
+    desc: 'Entender onde você está no mercado e o que te torna única.',
+    campos: [
+      { type:'textarea', name:'diferencial', label:'Por que alguém deveria te escolher no lugar de outra pessoa do seu setor?', ex:'Pode ser o atendimento, o processo, o resultado, o preço, a experiência que você entrega.', placeholder:'O que te diferencia...' },
+      { type:'textarea', name:'melhor_coisa', label:'Qual é a coisa que você faz melhor que qualquer outra pessoa da sua área?', ex:'Seja honesta. Isso não é arrogância — é clareza estratégica.', placeholder:'Sua maior força...' },
+      { type:'textarea', name:'elogios', label:'O que os seus clientes mais elogiam ou agradecem?', ex:'Pensa nos áudios de WhatsApp, nos comentários, nos stories de marcação. O que mais aparece?', placeholder:'Feedbacks mais frequentes...' },
+      { type:'textarea', name:'concorrentes', label:'Quem você considera seus 3 principais concorrentes diretos?', ex:'Podem ser marcas, profissionais, perfis no Instagram — o que seu cliente também avaliaria antes de te contratar.', placeholder:'Liste os concorrentes...' },
+      { type:'text', name:'como_compete', label:'Você compete mais por preço, qualidade, experiência ou nicho específico?', ex:'Ex: sou especialista só em mães de primeira viagem / entrego o resultado mais rápido.', placeholder:'Ex: qualidade e experiência' },
+    ]
+  },
+  {
+    num: 'Bloco 2 — Proposta de valor',
+    titulo: 'Qual é a sua<br><em>promessa central?</em>',
+    desc: 'Essas três perguntas são o coração do seu manual. Reserve um tempinho.',
+    campos: [
+      { type:'textarea', name:'proposta_valor', label:'Complete essa frase: "Eu ajudo [quem] a [fazer o quê] para que [resultado]."', ex:'Ex: Eu ajudo empreendedoras criativas a organizarem sua comunicação para que possam vender mais sem depender de sorte.', placeholder:'Eu ajudo...', tall:true },
+      { type:'textarea', name:'marca_pessoa', label:'Se a sua marca fosse uma pessoa e chegasse numa festa, como ela se apresentaria?', ex:'Ex: ela chegaria confiante, cumprimentaria todo mundo pelo nome, falaria pouco mas diria coisas que ficam na cabeça.', placeholder:'Como sua marca se apresentaria...' },
+      { type:'textarea', name:'problema_resolve', label:'Qual problema real e concreto você resolve na vida do seu cliente?', ex:'Não o que você vende — o que muda na vida dela depois que te contrata. Qual dor some? Qual sonho se aproxima?', placeholder:'Qual dor some, qual sonho se aproxima...', tall:true },
+      { type:'nota', texto:'✨ Essas três perguntas são o coração do seu manual. Vale muito responder com calma.' },
+    ]
+  },
+  {
+    num: 'Bloco 3 — Público-alvo',
+    titulo: 'Quem é seu<br><em>cliente ideal?</em>',
+    desc: 'Construir um retrato fiel — não uma estatística, uma pessoa real.',
+    campos: [
+      { type:'text', name:'faixa_etaria', label:'Qual é a faixa etária predominante dos seus clientes?', ex:'Ex: maioria entre 28 e 40 anos / tenho de tudo, de 20 a 60.', placeholder:'Ex: 28 a 40 anos' },
+      { type:'text', name:'genero', label:'Seu público é majoritariamente feminino, masculino ou misto?', placeholder:'Ex: majoritariamente feminino' },
+      { type:'text', name:'renda', label:'Qual é a faixa de renda aproximada do seu cliente ideal?', ex:'Ex: classe C com aspiração B / profissionais liberais com renda estável / classe A que valoriza exclusividade.', placeholder:'Ex: classe B, renda estável' },
+      { type:'textarea', name:'dia_a_dia', label:'O que seu cliente ideal faz no dia a dia?', ex:'Profissão, rotina, estilo de vida. Ex: é empreendedora que trabalha de casa, mãe com filhos pequenos.', placeholder:'Descreve a rotina do cliente ideal...' },
+      { type:'textarea', name:'dor_principal', label:'Qual é a maior dor ou frustração que seu cliente sente em relação ao que você oferece?', ex:'Ex: tentou de tudo e nada funciona / já foi enganada antes / não sabe por onde começar.', placeholder:'A maior frustração dela...' },
+    ]
+  },
+  {
+    num: 'Bloco 3 — Desejos e objeções',
+    titulo: 'O que ela quer<br><em>e o que a trava?</em>',
+    desc: 'Entender os desejos e objeções é o que vai fazer o manual soar verdadeiro.',
+    campos: [
+      { type:'textarea', name:'desejo', label:'O que seu cliente mais deseja alcançar ao te contratar?', ex:'Não o serviço em si — o sentimento, o resultado, a transformação. Ex: quer se sentir vista, quer finalmente ter clareza.', placeholder:'O que ela mais deseja...' },
+      { type:'textarea', name:'objecao', label:'Qual é o maior medo ou objeção antes de comprar?', ex:'Ex: "e se não funcionar pra mim?" / "será que vale o preço?" / "já tentei algo parecido e não deu certo".', placeholder:'O maior medo antes de comprar...' },
+      { type:'textarea', name:'frase_cliente', label:'Que frase esse cliente usaria para descrever o problema que você resolve?', ex:'Tenta usar as palavras dele, não as suas. Ex: "não sei como me posicionar" / "vendo bem mas não consigo crescer".', placeholder:'Nas palavras dela...' },
+      { type:'textarea', name:'cliente_ideal', label:'Me descreve um cliente real que você atendeu e que considera o cliente ideal.', ex:'Pode dar um nome fictício. Quem é essa pessoa, o que ela vivia antes, como foi o processo, o que mudou depois.', placeholder:'Conte a história dela...', tall:true },
+      { type:'nota', texto:'✨ Esse retrato é o que vai fazer seu manual soar verdadeiro — e não genérico. 😉' },
+    ]
+  },
+  {
+    num: 'Bloco 4 — Personalidade',
+    titulo: 'Como a sua marca<br><em>fala e se comporta?</em>',
+    desc: 'Definir como a sua marca se apresenta, fala e se posiciona no mundo.',
+    campos: [
+      { type:'text', name:'adjetivos_positivos', label:'Cite 3 adjetivos que você quer que as pessoas usem para descrever a sua marca.', ex:'Inspire-se: Confiante · Acolhedora · Criativa · Sofisticada · Direta · Inspiradora · Ousada · Humana · Exclusiva · Autêntica', placeholder:'Ex: sofisticada, acolhedora, transformadora' },
+      { type:'text', name:'adjetivos_negativos', label:'Cite 3 adjetivos que a sua marca JAMAIS quer que usem para descrevê-la.', ex:'Exemplos do que evitar: Fria · Genérica · Barata · Arrogante · Entediante · Amadora · Complicada · Impessoal', placeholder:'Ex: fria, genérica, amadora' },
+      { type:'text', name:'valores', label:'Quais são os 3 valores mais importantes para o seu negócio?', ex:'Ex: honestidade, resultado real, cuidado com o cliente, liberdade, excelência, pertencimento.', placeholder:'Ex: honestidade, excelência, cuidado' },
+      { type:'textarea', name:'pessoa_famosa', label:'Se a sua marca fosse uma pessoa famosa — real ou fictícia — quem seria? Por quê?', ex:'Ex: seria a Michelle Obama: poderosa, elegante, humana e inspiradora.', placeholder:'Quem seria e por quê...' },
+      { type:'text', name:'lugar_fisico', label:'Se a sua marca fosse um lugar físico, o que seria?', ex:'Ex: um café chique mas aconchegante / um estúdio de design moderno e silencioso / uma livraria cheia de segredos.', placeholder:'Ex: um café sofisticado e acolhedor' },
+    ]
+  },
+  {
+    num: 'Bloco 4 — Tom de voz e arquétipo',
+    titulo: 'Como ela<br><em>fala com o mundo?</em>',
+    desc: 'O tom de voz é o que vai fazer seu manual soar como você — e não como todo mundo.',
+    campos: [
+      { type:'text', name:'formalidade', label:'A marca fala de forma formal ou informal com o cliente?', ex:'Ex: usa "você" ou "tu"? Escreve como fala? Tem distância ou intimidade?', placeholder:'Ex: informal e próxima, mas com elegância' },
+      { type:'text', name:'tom', label:'A comunicação é mais séria e direta ou descontraída e próxima?', placeholder:'Ex: mistura de autoridade com leveza' },
+      { type:'textarea', name:'vocabulario', label:'Tem termos ou palavras que a sua marca usa muito? E alguma que evita?', ex:'Ex: sempre digo "transformação", "jornada", "resultado". Jamais uso "baratinho", "promoção relâmpago".', placeholder:'Palavras que usa e palavras que evita...' },
+      { type:'text', name:'arquetipo', label:'Qual arquétipo mais representa a sua marca?', ex:'Herói · Sábio · Criador · Cuidador · Explorador · Governante · Amante · Bobo · Mago · Rebelde · Inocente · Cara comum', placeholder:'Ex: Mago — transformação' },
+      { type:'text', name:'emocao', label:'Que emoção a sua marca quer provocar no cliente ao ser vista pela primeira vez?', ex:'Ex: alívio ("finalmente alguém que entende") / admiração / confiança / pertencimento / motivação.', placeholder:'Ex: confiança e alívio' },
+      { type:'textarea', name:'missao', label:'Existe uma crença ou missão maior que guia o seu negócio?', ex:'Ex: acredito que toda mulher merece se sentir poderosa na sua comunicação.', placeholder:'A crença que guia o negócio...' },
+    ]
+  },
+  {
+    num: 'Bloco 5 — Identidade visual',
+    titulo: 'Como a sua marca<br><em>aparece no mundo?</em>',
+    desc: 'Você vai trazer a sua logo pronta. A partir dela identificamos padrões. Não crio logos — organizo e potencializo o que você já tem.',
+    campos: [
+      { type:'upload', name:'logo', label:'Envie sua logo aqui (PNG, SVG ou PDF)', ex:'Se tiver mais de uma versão, envie a principal. Você também pode enviar direto para Giordana pelo WhatsApp.' },
+      { type:'textarea', name:'logo_desc', label:'Você já tem uma logo? Descreva ela brevemente.', ex:'Ex: sim, é o nome da marca em letra cursiva dourada / tenho duas versões, uma com símbolo e uma só com texto.', placeholder:'Descreva sua logo...' },
+      { type:'textarea', name:'cores', label:'Tem alguma cor que você associa à sua marca? Por que essa cor?', ex:'Ex: sempre me identifiquei com o verde-escuro, passa seriedade e saúde / quero tons terrosos / ainda não sei.', placeholder:'Cores e o porquê...' },
+      { type:'text', name:'sensacao_visual', label:'Que sensação visual você quer que a sua marca transmita?', ex:'Ex: sofisticação e exclusividade / leveza e otimismo / força e autoridade / acolhimento e proximidade.', placeholder:'Ex: sofisticação e acolhimento' },
+      { type:'textarea', name:'referencias_positivas', label:'Cite 3 marcas que você admira visualmente. O que te atrai nelas?', ex:'Pode ser um perfil do Instagram, um site, uma marca de roupa. O que te chama atenção no visual delas?', placeholder:'Marcas que admira e o que te atrai...', tall:true },
+      { type:'textarea', name:'aplicacoes', label:'Onde você quer aplicar sua identidade visual? O que é prioridade?', ex:'Ex: Instagram é o principal / precisamos de cartão de visita / quero um link da bio bonito.', placeholder:'Onde vai aplicar...' },
+    ]
+  },
+  {
+    num: 'Bloco 6 — Objetivos e canais',
+    titulo: 'Onde você<br><em>quer chegar?</em>',
+    desc: 'Entender o que você quer resolver e em quais plataformas vai atuar.',
+    campos: [
+      { type:'textarea', name:'meta_90dias', label:'O que você quer alcançar nos próximos 90 dias com a sua comunicação?', ex:'Ex: quero ter um feed organizado / quero começar a vender pelo Instagram / quero parar de depender só de indicação.', placeholder:'Sua meta para 90 dias...' },
+      { type:'textarea', name:'sucesso', label:'O que seria o sucesso para você ao final desse projeto?', ex:'Ex: me sentir confiante para postar / ter um manual que qualquer designer consiga seguir.', placeholder:'O que é sucesso para você...' },
+      { type:'text', name:'redes_prioridade', label:'Quais plataformas quer priorizar daqui pra frente?', ex:'Ex: quero focar só no Instagram por enquanto / quero entrar no TikTok / preciso de um site de verdade.', placeholder:'Ex: Instagram e WhatsApp' },
+      { type:'text', name:'frequencia', label:'Qual frequência de postagem você consegue manter de forma realista?', ex:'Ex: todos os dias / 3x por semana / quando sobrar tempo — preciso de ajuda nisso.', placeholder:'Ex: 3x por semana' },
+      { type:'textarea', name:'conteudo_engaja', label:'Que tipo de conteúdo o seu público mais engaja hoje?', ex:'Ex: bastidores / conteúdo educativo / fotos do produto / vídeos curtos / nada — não entendo o que funciona.', placeholder:'O que mais engaja hoje...' },
+      { type:'text', name:'formato_preferido', label:'Como você prefere se comunicar: texto, vídeo, imagem estática ou misto?', placeholder:'Ex: misto, mas prefiro texto' },
+    ]
+  },
+  {
+    num: 'Bloco 7 — Alinhamento final',
+    titulo: 'Última etapa.<br><em>Prometo.</em> 🙏',
+    desc: 'Você chegou até aqui — isso já diz muito sobre o quanto você leva o seu negócio a sério.',
+    campos: [
+      { type:'textarea', name:'entregavel', label:'O que você espera receber como entregável ao final desse projeto?', ex:'Ex: você quer direcionamento, acompanhamento ou materiais em PDF?', placeholder:'O que você espera receber...' },
+      { type:'textarea', name:'restricoes', label:'Tem alguma restrição que o manual deve respeitar?', ex:'Ex: não uso imagens de pessoas por questão religiosa / meu público é conservador.', placeholder:'Restrições importantes...' },
+      { type:'textarea', name:'tabus', label:'Existe algum tema ou abordagem que é tabu para a sua marca?', ex:'Ex: não quero nada associado a política / não quero linguagem muito corporativa.', placeholder:'O que deve ser evitado...' },
+      { type:'textarea', name:'extras', label:'Tem algo importante sobre a sua marca que eu ainda não perguntei?', ex:'Esse é o seu espaço livre. Conta o que quiser — curiosidade, contexto, história, aviso. Tudo é bem-vindo aqui.', placeholder:'Espaço livre — conte o que quiser...', tall:true },
+      { type:'nota', texto:'✨ Muito obrigada por dedicar esse tempo. Suas respostas são a base de tudo — e vou cuidar delas com muita atenção. 💛' },
+    ]
+  },
+];
+
+// ── ESTADO ─────────────────────────────────────────────────
+let etapaAtual = 0;
+const respostas = {};
+let logoFile = null;
+
+// ── INICIAR ─────────────────────────────────────────────────
+function iniciar() {
+  document.getElementById('tela-hero').style.display = 'none';
+  document.getElementById('tela-etapa').style.display = 'flex';
+  document.getElementById('nav-etapa').style.display = 'flex';
+  document.getElementById('logo-topo').classList.add('visivel');
+  renderEtapa(0);
+}
+
+// ── RENDER ETAPA ────────────────────────────────────────────
+function renderEtapa(idx) {
+  const e = etapas[idx];
+  const wrap = document.getElementById('etapa-wrap');
+  wrap.classList.remove('visivel');
+
+  let html = `
+    <div class="etapa-num">${e.num}</div>
+    <h2 class="etapa-titulo">${e.titulo}</h2>
+    <div class="etapa-divider"></div>
+    <p class="etapa-desc">${e.desc}</p>
+  `;
+
+  e.campos.forEach(c => {
+    if (c.type === 'nota') {
+      html += `<div class="nota">${c.texto}</div>`;
+      return;
+    }
+    if (c.type === 'upload') {
+      html += `
+        <div class="campo">
+          <label>${c.label}</label>
+          ${c.ex ? `<p class="ex">${c.ex}</p>` : ''}
+          <div class="upload-area" onclick="document.getElementById('logo-input').click()">
+            <input type="file" id="logo-input" accept=".png,.jpg,.jpeg,.svg,.pdf" onchange="capturarLogo(this)">
+            <div class="upload-icone">↑</div>
+            <p>Clique para selecionar o arquivo</p>
+            <p>PNG, JPG, SVG ou PDF</p>
+            <p class="upload-nome" id="upload-nome"></p>
+          </div>
+        </div>`;
+      return;
+    }
+    const val = respostas[c.name] || '';
+    const req = c.required ? ' *' : '';
+    html += `<div class="campo" id="campo-${c.name}">
+      <label>${c.label}${req}</label>
+      ${c.ex ? `<p class="ex">${c.ex}</p>` : ''}`;
+
+    if (c.type === 'textarea') {
+      html += `<textarea name="${c.name}" ${c.tall?'class="tall"':''} placeholder="${c.placeholder||''}" oninput="salvar('${c.name}',this.value)">${val}</textarea>`;
+    } else {
+      html += `<input type="${c.type}" name="${c.name}" value="${val}" placeholder="${c.placeholder||''}" oninput="salvar('${c.name}',this.value)">`;
+    }
+    html += `<span class="campo-erro">Por favor, preencha este campo para continuar.</span></div>`;
+  });
+
+  wrap.innerHTML = html;
+
+  // botões
+  document.getElementById('btn-voltar').style.display = idx === 0 ? 'none' : '';
+  const isUltima = idx === etapas.length - 1;
+  document.getElementById('btn-avancar').textContent = isUltima ? 'Enviar briefing ✦' : 'Continuar →';
+
+  // progresso
+  const pct = Math.round(((idx) / etapas.length) * 100);
+  document.getElementById('prog').style.width = pct + '%';
+
+  setTimeout(() => wrap.classList.add('visivel'), 30);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function salvar(nome, val) { respostas[nome] = val; }
+
+function capturarLogo(input) {
+  if (input.files[0]) {
+    logoFile = input.files[0];
+    respostas['logo_nome'] = logoFile.name;
+    document.getElementById('upload-nome').textContent = logoFile.name;
+  }
+}
+
+// ── VALIDAR ────────────────────────────────────────────────
+function validar() {
+  let ok = true;
+  etapas[etapaAtual].campos.forEach(c => {
+    if (c.required && !respostas[c.name]?.trim()) {
+      document.getElementById(`campo-${c.name}`)?.classList.add('invalido');
+      ok = false;
+    } else if (c.name) {
+      document.getElementById(`campo-${c.name}`)?.classList.remove('invalido');
+    }
+  });
+  return ok;
+}
+
+// ── NAVEGAÇÃO ──────────────────────────────────────────────
+function avancar() {
+  if (!validar()) return;
+  if (etapaAtual < etapas.length - 1) {
+    etapaAtual++;
+    renderEtapa(etapaAtual);
+  } else {
+    enviar();
+  }
+}
+
+function voltar() {
+  if (etapaAtual > 0) { etapaAtual--; renderEtapa(etapaAtual); }
+}
+
+// ── ENVIAR ─────────────────────────────────────────────────
+async function enviar() {
+  const btn = document.getElementById('btn-avancar');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(respostas)
+    });
+    document.getElementById('tela-etapa').style.display = 'none';
+    document.getElementById('nav-etapa').style.display = 'none';
+    document.getElementById('tela-sucesso').style.display = 'flex';
+    document.getElementById('prog').style.width = '100%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch {
+    btn.disabled = false;
+    btn.textContent = 'Tentar novamente';
+    alert('Algo deu errado. Tente novamente ou entre em contato pelo WhatsApp.');
+  }
+}
+</script>
+</body>
+</html>
